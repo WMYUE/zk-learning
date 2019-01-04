@@ -21,16 +21,27 @@ package org.apache.zookeeper.data;
 
 import org.apache.jute.*;
 public class Stat implements Record {
+  //创建的事务Id
   private long czxid;
+  //最后的事务Id
   private long mzxid;
+    //创建时间
   private long ctime;
+    //更新时间
   private long mtime;
+  //版本号
   private int version;
+  //子节点版本号
   private int cversion;
+  //ACL版本号
   private int aversion;
+  //创建改临时节点的sessionId
   private long ephemeralOwner;
+  //数据长度
   private int dataLength;
+  //子节点个数
   private int numChildren;
+  //子节点列表最后一次被修改的事务Id
   private long pzxid;
   public Stat() {
   }

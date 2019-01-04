@@ -27,9 +27,19 @@ import org.apache.zookeeper.Watcher.Event.KeeperState;
  *  the current state of the ZooKeeper, and the path of the znode that
  *  was involved in the event.
  */
+/**
+ *
+ * @param
+ * @param
+ * @param
+ * @return
+ */
 public class WatchedEvent {
+
     final private KeeperState keeperState;
+    //事件类型
     final private EventType eventType;
+    //节点的路径
     private String path;
     
     /**

@@ -693,6 +693,9 @@ public class PrepRequestProcessor extends ZooKeeperCriticalThread implements
         }
     }
 
+    /**
+     * 数据的版本检查
+     */
     private static int checkAndIncVersion(int currentVersion, int expectedVersion, String path)
             throws KeeperException.BadVersionException {
         if (expectedVersion != -1 && expectedVersion != currentVersion) {

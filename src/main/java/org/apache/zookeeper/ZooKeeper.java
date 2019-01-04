@@ -226,6 +226,9 @@ public class ZooKeeper {
      * the public methods will not be exposed as part of the ZooKeeper client
      * API.
      */
+    /**
+     *  存储相关的watcher，并提供增删改查等方法
+     */
     static class ZKWatchManager implements ClientWatchManager {
         private final Map<String, Set<Watcher>> dataWatches =
             new HashMap<String, Set<Watcher>>();
@@ -302,6 +305,11 @@ public class ZooKeeper {
             return removedWatchers;
         }
 
+        /**
+         *
+         * 判断是否存在都是分为两步，第一步是根据事件的类型判断出相应的map
+         * 第二步再是根据相应的path找到相应的set
+         */
         private boolean contains(String path, Watcher watcherObj,
                 Map<String, Set<Watcher>> pathVsWatchers) {
             boolean watcherExists = true;
@@ -538,6 +546,10 @@ public class ZooKeeper {
          * watch on the node
          * @return true if the watch should be added, otw false
          */
+        /**
+         * 根据返回的结果确定是否应该添加
+         * 这个返回结果又是怎样来的呢？
+         */
         protected boolean shouldAddWatch(int rc) {
             return rc == 0;
         }
@@ -651,6 +663,13 @@ public class ZooKeeper {
         this(connectString, sessionTimeout, watcher, false);
     }
 
+    /**
+     *
+     为了创建一个client,需要传递一个逗号分隔的 IP:端口 对列表，
+     session的构建是异步的，构造函数仅仅是初始化连接
+     watcher指定了状态变化时被通知的watcher
+     zookeeper会随意选择一个pair进行连接，如果连接失败，会选择另外一个
+     */
     /**
      * To create a ZooKeeper client object, the application needs to pass a
      * connection string containing a comma separated list of host:port pairs,
@@ -855,10 +874,8 @@ public class ZooKeeper {
         watchManager = defaultWatchManager();
         watchManager.defaultWatcher = watcher;
        
-        ConnectStringParser connectStringParser = new ConnectStringParser(
-                connectString);
-        hostProvider = new StaticHostProvider(
-                connectStringParser.getServerAddresses());
+        ConnectStringParser connectStringParser = new ConnectStringParser(connectString);
+        hostProvider = new StaticHostProvider(connectStringParser.getServerAddresses());
         cnxn = new ClientCnxn(connectStringParser.getChrootPath(),
                 hostProvider, sessionTimeout, this, watchManager,
                 getClientCnxnSocket(), sessionId, sessionPasswd, canBeReadOnly);

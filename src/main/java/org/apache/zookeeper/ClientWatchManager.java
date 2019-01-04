@@ -23,6 +23,9 @@ import java.util.Set;
 /**
  */
 public interface ClientWatchManager {
+   /**
+    * 根据事件类型，keeper状态，路径获取需要通知的相关watcher
+    */
     /**
      * Return a set of watchers that should be notified of the event. The 
      * manager must not notify the watcher(s), however it will update it's 
