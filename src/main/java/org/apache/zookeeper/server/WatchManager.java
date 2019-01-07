@@ -56,6 +56,7 @@ class WatchManager {
 
     synchronized void addWatch(String path, Watcher watcher) {
         HashSet<Watcher> list = watchTable.get(path);
+        //根据path找到相关watcher的set，添加进去
         if (list == null) {
             // don't waste memory if there are few watches on a node
             // rehash when the 4th entry is added, doubling size thereafter
@@ -64,16 +65,20 @@ class WatchManager {
             watchTable.put(path, list);
         }
         list.add(watcher);
-
+        //根据watcher找到相关的path的set
         HashSet<String> paths = watch2Paths.get(watcher);
         if (paths == null) {
-            // cnxns typically have many watches, so use default cap here
+            // 一个连接通常会有很多的watcher
             paths = new HashSet<String>();
             watch2Paths.put(watcher, paths);
         }
         paths.add(path);
     }
 
+    /**
+     * 首先根据watcher删除所有的连接，然后根据每个连接找到对应的watcher
+     * 注意对空的list的垃圾回收问题
+     */
     synchronized void removeWatcher(Watcher watcher) {
         HashSet<String> paths = watch2Paths.remove(watcher);
         if (paths == null) {
@@ -94,17 +99,20 @@ class WatchManager {
         return triggerWatch(path, type, null);
     }
 
+    /**
+     * 触发的是改path对应的所有watcher
+     * 首先根据path和eventType构造出相应的事件，移除watchTable对应的所有watcher
+     * 然后再每个watcher对应的path里面移除该path
+     * 最后再针对所有的watcher调用其回调函数process
+     */
     Set<Watcher> triggerWatch(String path, EventType type, Set<Watcher> supress) {
-        WatchedEvent e = new WatchedEvent(type,
-                KeeperState.SyncConnected, path);
+        WatchedEvent e = new WatchedEvent(type, KeeperState.SyncConnected, path);
         HashSet<Watcher> watchers;
         synchronized (this) {
             watchers = watchTable.remove(path);
             if (watchers == null || watchers.isEmpty()) {
                 if (LOG.isTraceEnabled()) {
-                    ZooTrace.logTraceMessage(LOG,
-                            ZooTrace.EVENT_DELIVERY_TRACE_MASK,
-                            "No watchers for " + path);
+                    ZooTrace.logTraceMessage(LOG, ZooTrace.EVENT_DELIVERY_TRACE_MASK, "No watchers for " + path);
                 }
                 return null;
             }

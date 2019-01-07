@@ -74,8 +74,7 @@ public class TxnLogProposalIterator implements Iterator<Proposal> {
             }
             baos.close();
 
-            QuorumPacket pp = new QuorumPacket(Leader.PROPOSAL, itr.getHeader()
-                    .getZxid(), baos.toByteArray(), null);
+            QuorumPacket pp = new QuorumPacket(Leader.PROPOSAL, itr.getHeader().getZxid(), baos.toByteArray(), null);
             p.packet = pp;
             p.request = null;
 

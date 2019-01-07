@@ -32,6 +32,7 @@ public interface TxnLog {
     /**
      * roll the current
      * log being appended to
+     * 将日志添加到新的文件
      * @throws IOException 
      */
     void rollLog() throws IOException;
@@ -39,7 +40,8 @@ public interface TxnLog {
      * Append a request to the transaction log
      * @param hdr the transaction header
      * @param r the transaction itself
-     * returns true iff something appended, otw false 
+     * returns true iff something appended, otw false
+     * 添加日志
      * @throws IOException
      */
     boolean append(TxnHeader hdr, Record r) throws IOException;
@@ -48,6 +50,7 @@ public interface TxnLog {
      * Start reading the transaction logs
      * from a given zxid
      * @param zxid
+     * 根据zxid读取日志
      * @return returns an iterator to read the 
      * next transaction in the logs.
      * @throws IOException
@@ -57,6 +60,7 @@ public interface TxnLog {
     /**
      * the last zxid of the logged transactions.
      * @return the last zxid of the logged transactions.
+     * 获取最大的zxid
      * @throws IOException
      */
     long getLastLoggedZxid() throws IOException;
@@ -64,6 +68,7 @@ public interface TxnLog {
     /**
      * truncate the log to get in sync with the 
      * leader.
+     * 同步事务日志
      * @param zxid the zxid to truncate at.
      * @throws IOException 
      */
@@ -72,6 +77,7 @@ public interface TxnLog {
     /**
      * the dbid for this transaction log. 
      * @return the dbid for this transaction log.
+     * 获取事务日志的数据库Id
      * @throws IOException
      */
     long getDbId() throws IOException;
@@ -79,6 +85,7 @@ public interface TxnLog {
     /**
      * commmit the trasaction and make sure
      * they are persisted
+     * 确保事务被持久化
      * @throws IOException
      */
     void commit() throws IOException;

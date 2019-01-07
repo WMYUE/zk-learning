@@ -62,6 +62,7 @@ public class WorkerService {
      * @param numThreads            number of worker threads (0 - N)
      *                              If 0, scheduled work is run immediately by
      *                              the calling thread.
+     *                              工作线程是否应该被单独的分配
      * @param useAssignableThreads  whether the worker threads should be
      *                              individually assignable or not
      */
@@ -76,6 +77,7 @@ public class WorkerService {
     /**
      * Callers should implement a class extending WorkRequest in order to
      * schedule work with the service.
+     * 静态类的用法
      */
     public static abstract class WorkRequest {
         /**
@@ -113,8 +115,7 @@ public class WorkerService {
             return;
         }
 
-        ScheduledWorkRequest scheduledWorkRequest =
-            new ScheduledWorkRequest(workRequest);
+        ScheduledWorkRequest scheduledWorkRequest = new ScheduledWorkRequest(workRequest);
 
         // If we have a worker thread pool, use that; otherwise, do the work
         // directly.
@@ -132,6 +133,7 @@ public class WorkerService {
         } else {
             // When there is no worker thread pool, do the work directly
             // and wait for its completion
+            //如果线程池忙,就让这个线程单独运行，这样做可以避免阻塞
             scheduledWorkRequest.start();
             try {
                 scheduledWorkRequest.join();
@@ -142,6 +144,9 @@ public class WorkerService {
         }
     }
 
+    /**
+     * 这是真正调用的线程，传入的是需要调用的WorkRequest
+     */
     private class ScheduledWorkRequest extends ZooKeeperThread {
         private final WorkRequest workRequest;
 
@@ -171,6 +176,9 @@ public class WorkerService {
      * thread factory because (1) we want to give the worker threads easier
      * to identify names; and (2) we want to make the worker threads daemon
      * threads so they don't block the server from shutting down.
+     * 使用DaemonThreadFactory的原因，第一是可以给每个线程一个具体的名字
+     * 第二是把他做成一个守护线程避免服务器关闭
+     * 静态类的用法
      */
     private static class DaemonThreadFactory implements ThreadFactory {
         final ThreadGroup group;
@@ -189,6 +197,7 @@ public class WorkerService {
             namePrefix = name + "-";
         }
 
+        //把线程和任务已经整合到了一起
         public Thread newThread(Runnable r) {
             Thread t = new Thread(group, r,
                                   namePrefix + threadNumber.getAndIncrement(),
@@ -201,6 +210,7 @@ public class WorkerService {
         }
     }
 
+    //不管threadsAreAssignable，实际上没有什么区别的
     public void start() {
         if (numWorkerThreads > 0) {
             if (threadsAreAssignable) {
@@ -216,6 +226,8 @@ public class WorkerService {
         stopped = false;
     }
 
+
+    //终止掉workers中的所有worker的运行
     public void stop() {
         stopped = true;
 
@@ -225,6 +237,7 @@ public class WorkerService {
         }
     }
 
+    //等待，看是否能够按时完成
     public void join(long shutdownTimeoutMS) {
         // Give the worker threads time to finish executing
         long now = System.currentTimeMillis();

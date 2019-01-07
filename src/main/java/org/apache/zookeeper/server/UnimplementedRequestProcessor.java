@@ -28,6 +28,9 @@ import org.apache.zookeeper.proto.ReplyHeader;
  * - sending back the KeeperException.UnimplementedException() error code to the client
  * - closing the connection.
  */
+/**
+ * 异常是怎样整合到request中的
+ */
 public class UnimplementedRequestProcessor implements RequestProcessor {
 
     public void processRequest(Request request) throws RequestProcessorException {

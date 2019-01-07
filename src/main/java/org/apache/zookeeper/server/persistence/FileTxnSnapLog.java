@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
  * above the implementations
  * of txnlog and snapshot
  * classes
+ * 需要区分snapshop和txnLog的关系
  */
 public class FileTxnSnapLog {
     //the direcotry containing the
@@ -122,6 +123,8 @@ public class FileTxnSnapLog {
                         + this.snapDir);
             }
         }
+        //首先应该确保dataDir和snapDir 这两个文件存在
+        // 然后再根据此构建txnLog和snapLog
         txnLog = new FileTxnLog(this.dataDir);
         snapLog = new FileSnap(this.snapDir);
     }
@@ -155,8 +158,7 @@ public class FileTxnSnapLog {
      * @return the highest zxid restored
      * @throws IOException
      */
-    public long restore(DataTree dt, Map<Long, Integer> sessions,
-            PlayBackListener listener) throws IOException {
+    public long restore(DataTree dt, Map<Long, Integer> sessions, PlayBackListener listener) throws IOException {
         snapLog.deserialize(dt, sessions);
         FileTxnLog txnLog = new FileTxnLog(dataDir);
         TxnIterator itr = txnLog.read(dt.lastProcessedZxid+1);
