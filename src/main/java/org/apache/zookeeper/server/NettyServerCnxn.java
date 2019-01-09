@@ -54,6 +54,14 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.MessageEvent;
 
+/**
+ *
+ *  nettyServerCnxn不仅仅代表了连接，更是封装了一系列和连接相关的参数
+ *  同时还封装了一个zookeeperServer 和一个 NettyServerCnxnFactory，不知道是为了什么
+ * @param
+ * @param
+ * @return
+ */
 public class NettyServerCnxn extends ServerCnxn {
     private static final Logger LOG = LoggerFactory.getLogger(NettyServerCnxn.class);
     Channel channel;
@@ -82,7 +90,12 @@ public class NettyServerCnxn extends ServerCnxn {
             this.zooKeeperSaslServer = new ZooKeeperSaslServer(factory.login);
         }
     }
-    
+
+    /**
+     * 关闭一个连接，就需要关闭所有与它相关的东西
+     * (1) 清除connectionfactory中的连接列表中的该连接
+     * (2) 获取该连接对应的连接地址，再根据地址获取所有的连接，然后删除对应的连接
+     */
     @Override
     public void close() {
         if (LOG.isDebugEnabled()) {
@@ -739,9 +752,15 @@ public class NettyServerCnxn extends ServerCnxn {
                         if (zks == null) {
                             throw new IOException("ZK down");
                         }
+                        /**
+                         * 具体的把2进制数据转换成帧数据
+                         * 分为initialized和非initialized
+                         */
                         if (initialized) {
+                            //把当前的连接和当前的数据缓存区同时传入zookeServer中
+                            //这一步做的很巧妙
+                            //因为当前的数据缓存区不可能恰恰是当前帧的大小，所以需要连接来不断处理
                             zks.processPacket(this, bb);
-
                             if (zks.shouldThrottle(outstandingCount.incrementAndGet())) {
                                 disableRecvNoWait();
                             }
@@ -809,7 +828,12 @@ public class NettyServerCnxn extends ServerCnxn {
     public void disableRecv() {
         disableRecvNoWait().awaitUninterruptibly();
     }
-    
+
+    /**
+     * 使一个通道不再接受数据
+     * 把throttled的值设为true
+     * 把channel的readable设为false
+     */
     private ChannelFuture disableRecvNoWait() {
         throttled = true;
         if (LOG.isDebugEnabled()) {

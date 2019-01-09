@@ -52,8 +52,7 @@ public class NettyServerCnxnFactory extends ServerCnxnFactory {
     ServerBootstrap bootstrap;
     Channel parentChannel;
     ChannelGroup allChannels = new DefaultChannelGroup("zkServerCnxns");
-    HashMap<InetAddress, Set<NettyServerCnxn>> ipMap =
-        new HashMap<InetAddress, Set<NettyServerCnxn>>( );
+    HashMap<InetAddress, Set<NettyServerCnxn>> ipMap = new HashMap<InetAddress, Set<NettyServerCnxn>>( );
     InetSocketAddress localAddress;
     int maxClientCnxns = 60;
     

@@ -39,7 +39,10 @@ import org.apache.zookeeper.server.auth.SaslServerCallbackHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * ServerCnxn中为什么会有zookeeperServer,真是让人困惑
+ * 不仅仅是生成连接的factory,也是管理连接的工具
+ */
 public abstract class ServerCnxnFactory {
 
     public static final String ZOOKEEPER_SERVER_CNXN_FACTORY = "zookeeper.serverCnxnFactory";
@@ -82,6 +85,9 @@ public abstract class ServerCnxnFactory {
     public abstract int getMaxClientCnxnsPerHost();
 
     /** Maximum number of connections allowed from particular host (ip) */
+    /**
+     * 每一个客户端IP所允许的最大连接数
+     */
     public abstract void setMaxClientCnxnsPerHost(int max);
 
     public abstract void startup(ZooKeeperServer zkServer)
@@ -136,8 +142,14 @@ public abstract class ServerCnxnFactory {
 
     public abstract InetSocketAddress getLocalAddress();
 
+    /**
+     * 重置所有连接的状态
+     */
     public abstract void resetAllConnectionStats();
 
+    /**
+     * 获取所有连接的相关信息
+     */
     public abstract Iterable<Map<String, Object>> getAllConnectionInfo(boolean brief);
 
     private final ConcurrentHashMap<ServerCnxn, ConnectionBean> connectionBeans =

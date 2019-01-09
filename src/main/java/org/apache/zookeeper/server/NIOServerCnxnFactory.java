@@ -188,7 +188,7 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
         private volatile boolean reconfiguring = false;
         
         public AcceptThread(ServerSocketChannel ss, InetSocketAddress addr,
-                Set<SelectorThread> selectorThreads) throws IOException {
+                            Set<SelectorThread> selectorThreads) throws IOException {
             super("NIOServerCxnFactory.AcceptThread:" + addr);
             this.acceptSocket = ss;
             this.acceptKey =
@@ -712,15 +712,20 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
     }
     
     /** {@inheritDoc} */
+    @Override
     public int getMaxClientCnxnsPerHost() {
         return maxClientCnxns;
     }
 
     /** {@inheritDoc} */
+    @Override
     public void setMaxClientCnxnsPerHost(int max) {
         maxClientCnxns = max;
     }
 
+    /**
+     * 这里是总的一个结构，启动各个线程和服务，但是他们到底是做什么的，还是不清楚
+     */
     @Override
     public void start() {
         stopped = false;
@@ -800,6 +805,12 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
         cnxnExpiryQueue.update(cnxn, cnxn.getSessionTimeout());
     }
 
+    /**
+     * (1)   指的是把一个连接加入到一个ip对应的所有连接的集合中
+     *       虽然set里面只有一个数据，但是把容量设置为2以避免reshah造成的性能损失
+     *  (2)  将连接加入到所有的cnxns中
+     *  (3)  更新时间的sessionTimeOut
+     */
     private void addCnxn(NIOServerCnxn cnxn) {
         InetAddress addr = cnxn.getSocketAddress();
         Set<NIOServerCnxn> set = ipMap.get(addr);
@@ -825,11 +836,17 @@ public class NIOServerCnxnFactory extends ServerCnxnFactory {
         touchCnxn(cnxn);
     }
 
+    /**
+     * 常见一个cnxn直接委托就行了
+     */
     protected NIOServerCnxn createConnection(SocketChannel sock,
             SelectionKey sk, SelectorThread selectorThread) throws IOException {
         return new NIOServerCnxn(zkServer, sock, sk, this, selectorThread);
     }
 
+    /**
+     * 获取某个被Ip对应的ServerCnxn的个数
+     */
     private int getClientCnxnCount(InetAddress cl) {
         Set<NIOServerCnxn> s = ipMap.get(cl);
         if (s == null) return 0;

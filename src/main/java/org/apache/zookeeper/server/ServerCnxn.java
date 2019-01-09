@@ -42,6 +42,8 @@ import org.apache.zookeeper.proto.RequestHeader;
 /**
  * Interface to a Server connection - represents a connection from a client
  * to the server.
+ * 代表的是一个客户端到服务器的连接，同时实现了Stats接口和Watcher接口
+ * 以下的这些抽象方法都是代表的一个zk连接应该有的操作
  */
 public abstract class ServerCnxn implements Stats, Watcher {
     // This is just an arbitrary object to represent requests issued by
@@ -57,16 +59,31 @@ public abstract class ServerCnxn implements Stats, Watcher {
      */
     boolean isOldClient = true;
 
+    /**
+     * session超时的管理
+     */
     abstract int getSessionTimeout();
 
+    /**
+     * 关闭连接
+     */
     abstract void close();
 
+    /**
+     *返回结果，什么样的操作应该是由连接来管理
+     */
     public abstract void sendResponse(ReplyHeader h, Record r, String tag)
         throws IOException;
 
     /* notify the client the session is closing and close/cleanup socket */
+    /**
+     * 通知客户端连接已接关闭
+     */
     abstract void sendCloseSession();
 
+    /**
+     * 回调处理watchedEvent
+     */
     public abstract void process(WatchedEvent event);
 
     abstract long getSessionId();
@@ -74,6 +91,9 @@ public abstract class ServerCnxn implements Stats, Watcher {
     abstract void setSessionId(long sessionId);
 
     /** auth info for the cnxn, returns an unmodifyable list */
+    /**
+     * 连接的授权信息优势如何为来控制的
+     */
     public List<Id> getAuthInfo() {
         return Collections.unmodifiableList(authInfo);
     }
