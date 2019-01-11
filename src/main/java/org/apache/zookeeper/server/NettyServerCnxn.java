@@ -714,16 +714,16 @@ public class NettyServerCnxn extends ServerCnxn {
         try {
             while(message.readable() && !throttled) {
                 if (bb != null) {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("message readable " + message.readableBytes()
-                                + " bb len " + bb.remaining() + " " + bb);
-                        ByteBuffer dat = bb.duplicate();
-                        dat.flip();
-                        LOG.trace(Long.toHexString(sessionId)
-                                + " bb 0x"
-                                + ChannelBuffers.hexDump(
-                                        ChannelBuffers.copiedBuffer(dat)));
-                    }
+//                    if (LOG.isTraceEnabled()) {
+//                        LOG.trace("message readable " + message.readableBytes()
+//                                + " bb len " + bb.remaining() + " " + bb);
+//                        ByteBuffer dat = bb.duplicate();
+//                        dat.flip();
+//                        LOG.trace(Long.toHexString(sessionId)
+//                                + " bb 0x"
+//                                + ChannelBuffers.hexDump(
+//                                        ChannelBuffers.copiedBuffer(dat)));
+//                    }
 
                     if (bb.remaining() > message.readableBytes()) {
                         int newLimit = bb.position() + message.readableBytes();
@@ -732,18 +732,18 @@ public class NettyServerCnxn extends ServerCnxn {
                     message.readBytes(bb);
                     bb.limit(bb.capacity());
 
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("after readBytes message readable "
-                                + message.readableBytes()
-                                + " bb len " + bb.remaining() + " " + bb);
-                        ByteBuffer dat = bb.duplicate();
-                        dat.flip();
-                        LOG.trace("after readbytes "
-                                + Long.toHexString(sessionId)
-                                + " bb 0x"
-                                + ChannelBuffers.hexDump(
-                                        ChannelBuffers.copiedBuffer(dat)));
-                    }
+//                    if (LOG.isTraceEnabled()) {
+//                        LOG.trace("after readBytes message readable "
+//                                + message.readableBytes()
+//                                + " bb len " + bb.remaining() + " " + bb);
+//                        ByteBuffer dat = bb.duplicate();
+//                        dat.flip();
+//                        LOG.trace("after readbytes "
+//                                + Long.toHexString(sessionId)
+//                                + " bb 0x"
+//                                + ChannelBuffers.hexDump(
+//                                        ChannelBuffers.copiedBuffer(dat)));
+//                    }
                     if (bb.remaining() == 0) {
                         packetReceived();
                         bb.flip();
@@ -765,25 +765,25 @@ public class NettyServerCnxn extends ServerCnxn {
                                 disableRecvNoWait();
                             }
                         } else {
-                            LOG.debug("got conn req request from "
-                                    + getRemoteSocketAddress());
+//                            LOG.debug("got conn req request from "
+//                                    + getRemoteSocketAddress());
                             zks.processConnectRequest(this, bb);
                             initialized = true;
                         }
                         bb = null;
                     }
                 } else {
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("message readable "
-                                + message.readableBytes()
-                                + " bblenrem " + bbLen.remaining());
-                        ByteBuffer dat = bbLen.duplicate();
-                        dat.flip();
-                        LOG.trace(Long.toHexString(sessionId)
-                                + " bbLen 0x"
-                                + ChannelBuffers.hexDump(
-                                        ChannelBuffers.copiedBuffer(dat)));
-                    }
+//                    if (LOG.isTraceEnabled()) {
+//                        LOG.trace("message readable "
+//                                + message.readableBytes()
+//                                + " bblenrem " + bbLen.remaining());
+//                        ByteBuffer dat = bbLen.duplicate();
+//                        dat.flip();
+//                        LOG.trace(Long.toHexString(sessionId)
+//                                + " bbLen 0x"
+//                                + ChannelBuffers.hexDump(
+//                                        ChannelBuffers.copiedBuffer(dat)));
+//                    }
 
                     if (message.readableBytes() < bbLen.remaining()) {
                         bbLen.limit(bbLen.position() + message.readableBytes());
@@ -793,17 +793,17 @@ public class NettyServerCnxn extends ServerCnxn {
                     if (bbLen.remaining() == 0) {
                         bbLen.flip();
 
-                        if (LOG.isTraceEnabled()) {
-                            LOG.trace(Long.toHexString(sessionId)
-                                    + " bbLen 0x"
-                                    + ChannelBuffers.hexDump(
-                                            ChannelBuffers.copiedBuffer(bbLen)));
-                        }
+//                        if (LOG.isTraceEnabled()) {
+//                            LOG.trace(Long.toHexString(sessionId)
+//                                    + " bbLen 0x"
+//                                    + ChannelBuffers.hexDump(
+//                                            ChannelBuffers.copiedBuffer(bbLen)));
+//                        }
                         int len = bbLen.getInt();
-                        if (LOG.isTraceEnabled()) {
-                            LOG.trace(Long.toHexString(sessionId)
-                                    + " bbLen len is " + len);
-                        }
+//                        if (LOG.isTraceEnabled()) {
+//                            LOG.trace(Long.toHexString(sessionId)
+//                                    + " bbLen len is " + len);
+//                        }
 
                         bbLen.clear();
                         if (!initialized) {
@@ -811,9 +811,9 @@ public class NettyServerCnxn extends ServerCnxn {
                                 return;
                             }
                         }
-                        if (len < 0 || len > BinaryInputArchive.maxBuffer) {
-                            throw new IOException("Len error " + len);
-                        }
+//                        if (len < 0 || len > BinaryInputArchive.maxBuffer) {
+//                            throw new IOException("Len error " + len);
+//                        }
                         bb = ByteBuffer.allocate(len);
                     }
                 }
